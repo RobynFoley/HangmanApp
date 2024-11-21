@@ -45,7 +45,7 @@ class Dictionary(serializerType: Serializer)
                 words.indexOf(word).toString() + ": " + word }
 
 
-
+    fun numberOfWords() = words.size
 
 
 }

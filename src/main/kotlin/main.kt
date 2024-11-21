@@ -2,11 +2,13 @@ import utils.readNextInt
 import utils.readNextLine
 import java.lang.System.exit
 import controllers.Dictionary
+import persistence.JSONSerializer
 import persistence.XMLSerializer
 import java.io.File
 
 
-val dictionary = Dictionary(XMLSerializer(File("dictionary.xml")))
+//private val dictionary = Dictionary(XMLSerializer(File("dictionary.xml")))
+private val dictionary = Dictionary(JSONSerializer(File("dictionary.json")))
 fun main(){
    load()
 runMenu()
