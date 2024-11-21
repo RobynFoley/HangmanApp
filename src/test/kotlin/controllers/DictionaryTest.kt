@@ -1,0 +1,85 @@
+package controllers
+
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import persistence.JSONSerializer
+import persistence.XMLSerializer
+import java.io.File
+
+class DictionaryTest {
+    @Nested
+    inner class PersistenceTests {
+
+        @Test
+        fun `saving and loading an empty collection in XML doesn't crash app`() {
+            // Saving an empty dictionary.XML file.
+            val storingWords = Dictionary(XMLSerializer(File("dictionary.xml")))
+            storingWords.store()
+
+            //Loading the empty dictionary.xml file into a new object
+            val loadedWords = Dictionary(XMLSerializer(File("dictionary.xml")))
+            loadedWords.load()
+
+            //Comparing the source of the words (storingWords) with the XML loaded words (loadedWords)
+            assertEquals(0, storingWords.numberOfWords())
+            assertEquals(0, loadedWords.numberOfWords())
+            assertEquals(storingWords.numberOfWords(), loadedWords.numberOfWords())
+        }
+
+        @Test
+        fun `saving and loading an loaded collection in XML doesn't loose data`() {
+            // Storing 3 notes to the notes.XML file.
+            val storingWords = Dictionary(XMLSerializer(File("dictionary.xml")))
+            storingWords.addWord("carrot")
+            storingWords.addWord("swim")
+            storingWords.addWord("helicopter")
+            storingWords.store()
+
+            //Loading notes.xml into a different collection
+            val loadedWords = Dictionary(XMLSerializer(File("dictionary.xml")))
+            loadedWords.load()
+
+        }
+
+        @Test
+        fun `saving and loading an empty collection in JSON doesn't crash app`() {
+            // Saving an empty notes.json file.
+            val storingWords = Dictionary(JSONSerializer(File("dictionary.json")))
+            storingWords.store()
+
+            //Loading the empty notes.json file into a new object
+            val loadedWords = Dictionary(JSONSerializer(File("Dictionary.json")))
+            loadedWords.load()
+
+            //Comparing the source of the notes (storingNotes) with the json loaded notes (loadedNotes)
+            assertEquals(0, storingWords.numberOfWords())
+            assertEquals(0, loadedWords.numberOfWords())
+            assertEquals(storingWords.numberOfWords(), loadedWords.numberOfWords())
+        }
+
+        @Test
+        fun `saving and loading an loaded collection in JSON doesn't loose data`() {
+            // Storing 3 notes to the notes.json file.
+            val storingWords = Dictionary(JSONSerializer(File("Dictionary.json")))
+            storingWords.addWord("summer")
+            storingWords.addWord("swim")
+            storingWords.addWord("tumeric")
+            storingWords.store()
+
+            //Loading notes.json into a different collection
+            val loadedWords = Dictionary(JSONSerializer(File("Dictionary.json")))
+            loadedWords.load()
+
+            //Comparing the source of the notes (storingNotes) with the json loaded notes (loadedNotes)
+            assertEquals(3, storingWords.numberOfWords())
+            assertEquals(3, loadedWords.numberOfWords())
+            assertEquals(storingWords.numberOfWords(), loadedWords.numberOfWords())
+
+        }
+    }
+
+
+}
