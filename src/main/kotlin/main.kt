@@ -2,6 +2,8 @@ import utils.readNextInt
 import utils.readNextLine
 import java.lang.System.exit
 import controllers.Dictionary
+import controllers.PlayerAPI
+import models.Player
 import persistence.JSONSerializer
 import persistence.XMLSerializer
 import java.io.File
@@ -9,9 +11,11 @@ import java.io.File
 
 //private val dictionary = Dictionary(XMLSerializer(File("dictionary.xml")))
 private val dictionary = Dictionary(JSONSerializer(File("dictionary.json")))
+private val playerAPI = PlayerAPI(JSONSerializer(File("players.json")))
+
 fun main(){
-   load()
-runMenu()
+    load()
+    runMenu()
 
 
 }
@@ -51,7 +55,7 @@ fun runMenu() {
             0 -> exitApp()
             else -> println("Invalid option entered: $option")
         }
-        } while (true)
+    } while (true)
 }
 
 fun play(){
@@ -59,48 +63,94 @@ fun play(){
 }
 
 fun viewPlayer(){
-
+println(playerAPI.listPlayers())
 }
 
 fun addPlayer(){
+    val name = readNextLine("Enter Player Name:  ")
 
-}
+    val isAdded = playerAPI.add(Player(name, 0, 0))
 
-fun updatePlayer(){
-
-}
-
-fun deletePlayer(){
-
-}
-
-fun wordDictionary(){
-dictionary.listAllWords()
-}
-
-fun updateDictionary(){
-val word = readNextLine("Enter a word: ")
-dictionary.addWord(word)
+    if (isAdded) {
+        println("Added Successfully")
+    } else {
+        println("Add Failed")
+    }
     save()
 }
 
-fun exitApp() {
-    println("Exiting...bye")
-    exit(0)
-}
+fun updatePlayer(){
+    println(playerAPI.listPlayers())
 
-fun save() {
-    try {
-        dictionary.store()
-    } catch (e: Exception) {
-        System.err.println("Error writing to file: $e")
+    if (playerAPI.numberOfPlayers() > 0) {
+        //only ask the user to choose the note if notes exist
+        val indexToUpdate = readNextInt("Enter the index of the player to update: ")
+        if (playerAPI.isValidIndex(indexToUpdate)) {
+            val name = readNextLine("Enter new player name: ")
+            playerAPI.updatePlayer(indexToUpdate, name)
+        } else {
+            println("Invalid index")
+        }
     }
-}
+    save()
+    }
 
-fun load() {
-    try {
-        dictionary.load()
-    } catch (e: Exception) {
-        System.err.println("Error reading from file: $e")
-    }
-}
+    fun deletePlayer(){
+        println(playerAPI.listPlayers())
+
+        if (playerAPI.numberOfPlayers() > 0) {
+            //only ask the user to choose the player to delete if player exist
+            val indexToDelete = readNextInt("Enter the index of the player to delete: ")
+
+            val playerToDelete = playerAPI.removePlayer(indexToDelete)
+            if (playerToDelete != null) {
+                println("Delete Successful! Deleted Player: ${playerToDelete.playerName}")
+            } else {
+                println("Delete NOT Successful")
+            }
+        }
+        }
+
+        fun wordDictionary(){
+            dictionary.listAllWords()
+        }
+
+        fun updateDictionary(){
+            val word = readNextLine("Enter a word: ")
+            dictionary.addWord(word)
+            save()
+        }
+
+        fun exitApp() {
+            println("Exiting...bye")
+            exit(0)
+        }
+
+        fun save() {
+            try {
+                dictionary.store()
+            } catch (e: Exception) {
+                System.err.println("Error writing to file: $e")
+            }
+
+            try {
+                playerAPI.store()
+            } catch (e: Exception) {
+                System.err.println("Error writing to file: $e")
+            }
+
+        }
+
+        fun load() {
+            try {
+                dictionary.load()
+            } catch (e: Exception) {
+                System.err.println("Error reading from file: $e")
+            }
+
+            try {
+                playerAPI.load()
+            } catch (e: Exception) {
+                System.err.println("Error reading from file: $e")
+            }
+        }
