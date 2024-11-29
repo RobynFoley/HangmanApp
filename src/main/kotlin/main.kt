@@ -1,22 +1,23 @@
-import utils.readNextInt
-import utils.readNextLine
-import java.lang.System.exit
 import controllers.Dictionary
+import controllers.Game
 import controllers.PlayerAPI
 import models.Player
 import persistence.JSONSerializer
-import persistence.XMLSerializer
+import utils.readNextInt
+import utils.readNextLine
 import java.io.File
+import java.lang.System.exit
 
 
 //private val dictionary = Dictionary(XMLSerializer(File("dictionary.xml")))
 private val dictionary = Dictionary(JSONSerializer(File("dictionary.json")))
 private val playerAPI = PlayerAPI(JSONSerializer(File("players.json")))
+private val game = Game()
 
 fun main(){
     load()
+    dictionaryStartUp()
     runMenu()
-
 
 }
 
@@ -59,6 +60,9 @@ fun runMenu() {
 }
 
 fun play(){
+    val index = (0..(dictionary.numberOfWords()-1)).random()
+    val word = dictionary.getWord(index)
+    game.run(word)
 
 }
 
@@ -116,12 +120,47 @@ fun updatePlayer(){
         }
 
         fun updateDictionary(){
-            val word = readNextLine("Enter a word: ")
-            dictionary.addWord(word)
-            save()
-        }
+            print(""" 
+         > ----------------------------------
+         > |   Do you want to               |
+         > |   1) Add word                  |
+         > |   2) Update word               |
+         > |   3) Delete word               |
+         > ---------------------------------- 
+         >""".trimMargin(">"))
+            val response = readNextInt(" > ==>>")
+
+            if(response == 1){
+                val word = readNextLine("Enter a word: ")
+                dictionary.addWord(word)
+                save()
+            }else if(response == 2){
+                dictionary.listAllWords()
+                val index = readNextInt("Enter the index of the word you want to update: ")
+                val updatedWord = readNextLine("Enter the new word: ")
+                dictionary.updateWord(index, updatedWord)}
+                else if (response == 3){
+                dictionary.listAllWords()
+                val index = readNextInt("Enter the index of the word you want to delete: ")
+                dictionary.deleteWord(index)
+                }else{println("Invalid response")}
+
+
+
+            }
+
+
+fun dictionaryStartUp(){
+    val words = arrayOf("manifest", "puzzle", "pirate", "desert", "journey", "thunder", "library",
+        "lantern", "compass", "galaxy", "cathedral", "treacherous")
+    for (word in words) {
+        dictionary.addWord(word!!)
+    }
+
+}
 
         fun exitApp() {
+            save()
             println("Exiting...bye")
             exit(0)
         }

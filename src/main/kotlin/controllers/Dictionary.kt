@@ -2,12 +2,22 @@ package controllers
 
 import persistence.Serializer
 import utils.isValidListIndex
+import java.util.*
+import kotlin.collections.ArrayList
 
 class Dictionary(serializerType: Serializer)
 {
     private var serializer: Serializer = serializerType
     private var words = ArrayList<String>()
 
+
+    fun getWord(index: Int): String{
+        return words[index]
+    }
+
+    fun updateWord(index: Int, word: String){
+        words[index] = word.lowercase()
+    }
 
     @Throws(Exception::class)
     fun load() {
@@ -21,17 +31,24 @@ class Dictionary(serializerType: Serializer)
 
 
     fun addWord(word: String){
-        words.add(word)
+        if (!words.contains(word.lowercase(Locale.getDefault()))){
+        words.add(word.lowercase(Locale.getDefault()))}
 
     }
 
 
+//https://stackoverflow.com/questions/37609071/array-list-iteration-without-extra-object-allocations
+// I took the for loop from this website
+    fun listAllWords() : Any =
 
-    fun listAllWords(): Any =
-        if  (words.isEmpty()) "No words stored"
-        else for (word in words) {
-            println(word)
+        if (words.isEmpty()) "No words stored"
+        else for (i in words.indices) {
+            println("$i:  ${words[i]}")
         }
+
+
+
+
 
     fun deleteWord(indexToDelete: Int): String? {
         return if (isValidListIndex(indexToDelete, words)) {
