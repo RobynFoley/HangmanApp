@@ -15,7 +15,11 @@ class PlayerAPI(serializerType: Serializer) {
     }
 
     fun updatePlayer(index: Int, name: String) {
-       players[index].setPlayerNAme(name)
+       players[index].playerName = name
+    }
+
+    fun getPlayer(index: Int): Player {
+        return players[index]
     }
 
     fun listPlayers(): String =
@@ -30,7 +34,7 @@ class PlayerAPI(serializerType: Serializer) {
     private fun formatListString(playersToFormat: List<Player>): String =
         playersToFormat
             .joinToString(separator = "\n") { player ->
-                players.indexOf(player).toString() + ": " + player.toString()
+                players.indexOf(player).toString() + ":    " + player.toString()
             }
 
     fun removePlayer(indexToDelete: Int): Player? {
@@ -53,4 +57,14 @@ class PlayerAPI(serializerType: Serializer) {
     fun store() {
         serializer.write(players)
     }
+
+    fun increaseGameCount(player: Player?) {
+        player?.gamesPlayed = player?.gamesPlayed!! + 1
+    }
+
+    fun increaseWinCount(player: Player?) {
+        player?.winCount = player?.winCount!! + 1
+    }
+
+
 }

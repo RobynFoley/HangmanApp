@@ -5,8 +5,8 @@ data class Player (
     var winCount: Int,
     var gamesPlayed: Int
 ){
-fun setPlayerNAme(playerName: String){
-    this.playerName = playerName
-}
 
+    override fun toString(): String {
+        return """NAME:$playerName,     WINS: $winCount, TOTAL GAMES: $gamesPlayed""".trimMargin()
+    }
 }
