@@ -13,10 +13,13 @@ import java.lang.System.exit
 private val dictionary = Dictionary(JSONSerializer(File("dictionary.json")))
 private val playerAPI = PlayerAPI(JSONSerializer(File("players.json")))
 private val game = Game()
+private var currentPlayer: Player? = null
 
 fun main(){
     load()
+
     dictionaryStartUp()
+    switchPlayer()
     runMenu()
 
 }
@@ -24,16 +27,17 @@ fun main(){
 fun mainMenu(): Int {
     print(""" 
          > ----------------------------------
-         > |        NOTE KEEPER APP         |
+         > |           HANGMAN              |
          > ----------------------------------
          > | NOTE MENU                      |
          > |   1) Play                      |
-         > |   2) View Player               |                  
-         > |   3) Add Player                |
-         > |   4) Update Player             |
-         > |   5) Delete Player             |
-         > |   6) Word Dictionary           |
-         > |   7) Update Dictionary         |
+         > |   2) Switch Player             |
+         > |   3) View Players              |              PLAYER: ${currentPlayer?.playerName}    
+         > |   4) Add Player                |                      ${currentPlayer?.winCount} wins
+         > |   5) Update Player             |                      ${currentPlayer?.gamesPlayed} games played 
+         > |   6) Delete Player             |
+         > |   7) Word Dictionary           |
+         > |   8) Update Dictionary         |
          > |                                |
          > ----------------------------------
          > |   0) Exit                      |
@@ -42,17 +46,43 @@ fun mainMenu(): Int {
     return readNextInt(" > ==>>")
 }
 
+fun switchPlayer(){
+    if(playerAPI.numberOfPlayers() > 0){
+    println("Enter index of your player")
+    println(playerAPI.listPlayers())
+    println()
+    println("enter -1 to add new player")
+
+        val choice = readNextInt(" > ==>>")
+        currentPlayer = if (choice == -1){
+            val name = readNextLine("Enter Player Name:  ")
+            playerAPI.add(Player(name, 0, 0))
+            val index = (playerAPI.numberOfPlayers()-1)
+            playerAPI.getPlayer(index)
+        }else{
+            playerAPI.getPlayer(choice)
+        }
+
+    }else{
+        val name = readNextLine("Enter Player Name:  ")
+        playerAPI.add(Player(name, 0, 0))
+        currentPlayer = playerAPI.getPlayer(0)
+    }
+}
+
+
 fun runMenu() {
     do{
         val option = mainMenu()
         when (option) {
             1 -> play()
-            2 -> viewPlayer()
-            3 -> addPlayer()
-            4 -> updatePlayer()
-            5 -> deletePlayer()
-            6 -> wordDictionary()
-            7 -> updateDictionary()
+            2 -> switchPlayer()
+            3 -> viewPlayer()
+            4 -> addPlayer()
+            5 -> updatePlayer()
+            6 -> deletePlayer()
+            7 -> wordDictionary()
+            8 -> updateDictionary()
             0 -> exitApp()
             else -> println("Invalid option entered: $option")
         }
@@ -62,7 +92,10 @@ fun runMenu() {
 fun play(){
     val index = (0..(dictionary.numberOfWords()-1)).random()
     val word = dictionary.getWord(index)
-    game.run(word)
+    val win = game.run(word)
+    if (win) playerAPI.increaseWinCount(currentPlayer)
+
+    playerAPI.increaseGameCount(currentPlayer)
 
 }
 
@@ -87,7 +120,7 @@ fun updatePlayer(){
     println(playerAPI.listPlayers())
 
     if (playerAPI.numberOfPlayers() > 0) {
-        //only ask the user to choose the note if notes exist
+
         val indexToUpdate = readNextInt("Enter the index of the player to update: ")
         if (playerAPI.isValidIndex(indexToUpdate)) {
             val name = readNextLine("Enter new player name: ")
