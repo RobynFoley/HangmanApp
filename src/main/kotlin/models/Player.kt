@@ -7,6 +7,6 @@ data class Player (
 ){
 
     override fun toString(): String {
-        return """NAME:$playerName,     WINS: $winCount, TOTAL GAMES: $gamesPlayed""".trimMargin()
+        return """NAME:${playerName.toUpperCase()}     WINS: $winCount TOTAL GAMES: $gamesPlayed""".trimMargin()
     }
 }

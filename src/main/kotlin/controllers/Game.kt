@@ -1,10 +1,11 @@
 package controllers
+import utils.readNextChar
 
 
 
 class Game {
 
-    //I used this to help me understand loops
+    //I used this to help me understand different loops
     //https://kotlinlang.org/docs/control-flow.html#for-loops
 
     fun run(word: String): Boolean{
@@ -27,9 +28,10 @@ class Game {
 
 
         while (!(hangman == list)) {
-            val guess = readln().first()
+            val guess = readNextChar("Enter a Letter:  ")
+
             if (guess in list) {
-                println("yay")
+                println("yippy")
                 hangman.add(guess)
 
                 //for(i in hangman.indices) {

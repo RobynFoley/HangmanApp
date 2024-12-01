@@ -32,9 +32,9 @@ fun mainMenu(): Int {
          > | NOTE MENU                      |
          > |   1) Play                      |
          > |   2) Switch Player             |
-         > |   3) View Players              |              PLAYER: ${currentPlayer}    
-         > |   4) Add Player                |
-         > |   5) Update Player             |
+         > |   3) View Players              |              PLAYER: ${currentPlayer?.playerName}    
+         > |   4) Add Player                |                      ${currentPlayer?.winCount} wins
+         > |   5) Update Player             |                      ${currentPlayer?.gamesPlayed} games played 
          > |   6) Delete Player             |
          > |   7) Word Dictionary           |
          > |   8) Update Dictionary         |
@@ -48,16 +48,25 @@ fun mainMenu(): Int {
 
 fun switchPlayer(){
     if(playerAPI.numberOfPlayers() > 0){
-    println("Which player are you?")
+    println("Enter index of your player")
     println(playerAPI.listPlayers())
+    println()
+    println("enter -1 to add new player")
 
         val choice = readNextInt(" > ==>>")
-        currentPlayer = playerAPI.getPlayer(choice)
+        currentPlayer = if (choice == -1){
+            val name = readNextLine("Enter Player Name:  ")
+            playerAPI.add(Player(name, 0, 0))
+            val index = (playerAPI.numberOfPlayers()-1)
+            playerAPI.getPlayer(index)
+        }else{
+            playerAPI.getPlayer(choice)
+        }
 
     }else{
         val name = readNextLine("Enter Player Name:  ")
         playerAPI.add(Player(name, 0, 0))
-
+        currentPlayer = playerAPI.getPlayer(0)
     }
 }
 
@@ -111,7 +120,7 @@ fun updatePlayer(){
     println(playerAPI.listPlayers())
 
     if (playerAPI.numberOfPlayers() > 0) {
-        //only ask the user to choose the note if notes exist
+
         val indexToUpdate = readNextInt("Enter the index of the player to update: ")
         if (playerAPI.isValidIndex(indexToUpdate)) {
             val name = readNextLine("Enter new player name: ")

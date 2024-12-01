@@ -18,8 +18,11 @@ class PlayerAPI(serializerType: Serializer) {
        players[index].playerName = name
     }
 
-    fun getPlayer(index: Int): Player {
-        return players[index]
+    fun getPlayer(index: Int): Player? {
+        return if (isValidListIndex(index, players)) {
+            return players[index]
+        } else null
+
     }
 
     fun listPlayers(): String =
