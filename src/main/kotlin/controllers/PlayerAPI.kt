@@ -5,11 +5,26 @@ import models.Player
 import persistence.Serializer
 import utils.isValidListIndex
 
+
+/**
+ * This class manages a list of players and provides functionality for adding, updating, deleting,
+ * and listing players. It uses a [Serializer] to load and store the notes persistently.
+ *
+ * @property serializer A serializer instance for reading and writing the notes.
+ * @constructor Initializes the PlayerAPI with the specified [serializerType].
+ */
 class PlayerAPI(serializerType: Serializer) {
     private var serializer: Serializer = serializerType
     private var players = ArrayList<Player>()
 
 
+
+    /**
+     * Adds a new [Player] to the list.
+     *
+     * @param player The [Player] to be added.
+     * @return `true` if the player was successfully added, `false` otherwise.
+     */
     fun add(player: Player): Boolean {
         return players.add(player)
     }
