@@ -86,5 +86,19 @@ class PlayerAPI(serializerType: Serializer) {
         player?.winCount = player?.winCount!! + 1
     }
 
+    fun listBestPlayers(){
+        if (players.isEmpty()){
+            "No Players stored"
+        } else {
+          val list =  players.sortedByDescending { it.winCount }
+                .take(3) // Take the top 3 players.
 
-}
+          for (player in list){
+              println("${player.playerName} -  ${player.winCount} wins" )
+          }
+            }
+
+        }
+    }
+
+
