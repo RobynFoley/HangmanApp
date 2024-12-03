@@ -1,6 +1,6 @@
 package controllers
 import utils.readNextChar
-
+import utils.readNextLine
 
 
 class Game {
@@ -28,9 +28,15 @@ class Game {
 
 
         while (!(hangman == list)) {
-            val guess = readNextChar("Enter a Letter:  ")
+            val guessWord = readNextLine("Enter your guess:  ")
+            if (guessWord == word) {
+                for(letter in list){
+                    hangman.add(letter)
+                }
+            }else {
 
-            if (guess in list) {
+                val guess = guessWord.first()
+                if (guess in list) {
                 println("yippy")
                 hangman.add(guess)
 
@@ -47,18 +53,19 @@ class Game {
                 println("no")
                 println(progress)
                 guessCount++
-            }
+            }}
             hangman.sort()
             hangman = ArrayList(hangman.distinct())
 
             if (guessCount == 15){
+                println("You Lose !!!")
                 return false
             }
         }
 
 
 
-        println("done!")
+        println("You Win !!!")
         return true
 
     }
