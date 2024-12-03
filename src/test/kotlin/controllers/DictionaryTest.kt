@@ -1,7 +1,8 @@
 package controllers
 
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -10,6 +11,78 @@ import persistence.XMLSerializer
 import java.io.File
 
 class DictionaryTest {
+    private var dictionary: Dictionary? = null
+    private var emptyDictionary: Dictionary? = null
+
+    @BeforeEach
+    fun setup() {
+        dictionary = Dictionary(XMLSerializer(File("dictionary.xml")))
+        emptyDictionary = Dictionary(XMLSerializer(File("empty-dictionary.xml")))
+
+        // Adding sample words to dictionary
+        dictionary!!.addWord("apple")
+        dictionary!!.addWord("banana")
+        dictionary!!.addWord("carrot")
+    }
+
+    @AfterEach
+    fun tearDown() {
+        dictionary = null
+        emptyDictionary = null
+    }
+
+    @Nested
+    inner class AddWords {
+        @Test
+        fun `adding a new word adds it to the dictionary`() {
+            assertEquals(3, dictionary!!.numberOfWords())
+            dictionary!!.addWord("date")
+            assertEquals(4, dictionary!!.numberOfWords())
+        }
+
+        @Test
+        fun `adding a duplicate word does not add it again`() {
+            assertEquals(3, dictionary!!.numberOfWords())
+            dictionary!!.addWord("apple")
+            assertEquals(3, dictionary!!.numberOfWords())
+        }
+    }
+
+    @Nested
+    inner class ListWords {
+        @Test
+        fun `listAllWords returns No words stored when dictionary is empty`() {
+            assertEquals("No words stored", emptyDictionary!!.listAllWords())
+        }
+
+    }
+
+    @Nested
+    inner class DeleteWords {
+        @Test
+        fun `deleting a word removes it from the dictionary`() {
+            assertEquals(3, dictionary!!.numberOfWords())
+            assertEquals("banana", dictionary!!.deleteWord(1))
+            assertEquals(2, dictionary!!.numberOfWords())
+        }
+
+        @Test
+        fun `deleting a non-existent word returns null`() {
+            assertNull(dictionary!!.deleteWord(5))
+            assertNull(emptyDictionary!!.deleteWord(0))
+        }
+    }
+
+    @Nested
+    inner class UpdateWords {
+        @Test
+        fun `updating a word modifies it in the dictionary`() {
+            dictionary!!.updateWord(1, "blueberry")
+            assertEquals("blueberry", dictionary!!.getWord(1))
+        }
+    }
+
+
     @Nested
     inner class PersistenceTests {
 
