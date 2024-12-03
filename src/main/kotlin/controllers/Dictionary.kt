@@ -7,6 +7,14 @@ import java.util.Locale
 
 import kotlin.collections.ArrayList
 
+
+/**
+ * This class manages a list of words and provides functionality for adding, updating, deleting,
+ * and listing words in the dictionary. It uses a [Serializer] to load and store the notes persistently.
+ *
+ * @property serializer A serializer instance for reading and writing the notes.
+ * @constructor Initializes the Dictionary with the specified [serializerType].
+ */
 class Dictionary(serializerType: Serializer)
 {
     private var serializer: Serializer = serializerType

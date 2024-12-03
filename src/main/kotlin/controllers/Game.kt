@@ -1,8 +1,12 @@
 package controllers
+import persistence.Serializer
 import utils.readNextChar
 import utils.readNextLine
 
-
+/**
+ * This class contains code for a simple hangman game
+ *
+ */
 class Game {
 
     //I used this to help me understand different loops
