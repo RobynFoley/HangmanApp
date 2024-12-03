@@ -36,9 +36,10 @@ fun mainMenu(): Int {
          > |   1) Play                      |              ${currentPlayer?.winCount} wins
          > |   2) Switch Player             |              ${currentPlayer?.gamesPlayed} games played
          > |   3) View Players              |                  
-         > |   4) Add Player                |   
+         > |   4) Add Player                | 
+         > |   5) Best Players              |
          > |                                |                   
-         > |   5)Admin Menu                 |                      
+         > |   6)Admin Menu                 |                      
          > ----------------------------------
          > |   0) Exit                      |
          > ---------------------------------- 
@@ -71,10 +72,15 @@ fun isAdmin(){
 
     if(adminAPI.isAdmin(currentPlayer)){
       val password = readNextLine("Enter Password:")
-        if(password == adminAPI.getPasswordByPlayer(currentPlayer)){
+        if(password == adminAPI.getPasswordByPlayer(currentPlayer)) {
             runAdminMenu()
         }
-    }
+    }else if(adminAPI.numberOfAdmins() == 0){
+            val password = readNextLine("Enter Password:")
+            if(password == "admin"){
+                runAdminMenu()
+            }
+        }
 }
 
 fun switchPlayer(){
@@ -110,7 +116,8 @@ fun runMenu() {
             2 -> switchPlayer()
             3 -> viewPlayer()
             4 -> addPlayer()
-            5 -> isAdmin()
+            5 -> playerAPI.listBestPlayers()
+            6 -> isAdmin()
             0 -> exitApp()
             else -> println("Invalid option entered: $option")
         }
@@ -139,9 +146,11 @@ fun addAdmin(){
     if (playerAPI.numberOfPlayers() > 0) {
         val index = readNextInt("Enter the index of the player you want to make admin: ")
         if(playerAPI.isValidIndex(index)){
-            println("Default password is 'admin'")
+
           if(  adminAPI.add(Admin(playerAPI.getPlayer(index), "admin"))){
               println("A new admin was added")
+              Thread.sleep(250)
+              println("Default password is 'admin'")
           }
         }
 
@@ -274,7 +283,18 @@ fun updatePlayer(){
 
 fun dictionaryStartUp(){
     val words = arrayOf("manifest", "puzzle", "pirate", "desert", "journey", "thunder", "library",
-        "lantern", "compass", "galaxy", "cathedral", "treacherous")
+        "lantern", "compass", "galaxy", "cathedral", "treacherous", "voyage", "island",
+        "fortress", "mystery", "enchanted", "phantom", "treasure", "crystal", "adventure",
+        "shadow", "labyrinth", "voyager", "serpent", "storm", "meadow", "oracle",
+        "cavern", "oasis", "expedition", "artifact", "quicksand", "sanctuary",
+        "wildfire", "guardian", "monsoon", "whirlpool", "beacon", "wilderness",
+        "paradise", "armada", "nebula", "harbinger", "rift", "twilight", "cyclone",
+        "aurora", "abyss", "labyrinth", "corsair", "tempest", "bastion", "expanse",
+        "citadel", "artifact", "quasar", "horizon", "obsidian", "leviathan", "zephyr",
+        "cascade", "ember", "raven", "eclipse", "mirage", "summit", "evergreen",
+        "embers", "shimmer", "grotto", "vortex", "hollow", "specter", "glacier",
+        "harbor", "solstice", "tundra", "crescent", "serenity", "traverse", "voyager",
+        "labyrinthine", "thistle", "spirit", "expedition", "chimera", "nebulae")
     for (word in words) {
         dictionary.addWord(word!!)
     }

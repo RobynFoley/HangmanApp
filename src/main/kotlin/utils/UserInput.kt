@@ -42,8 +42,14 @@ fun readNextFloat(prompt: String?): Float {
 
 
 fun readNextLine(prompt: String?): String {
-    print(prompt)
-    return readln()
+    do {
+        try {
+            print(prompt)
+            return readln()
+        } catch (e: Exception) {
+            System.err.println("\tEnter a character please.")
+        }
+    } while (true)
 }
 
 

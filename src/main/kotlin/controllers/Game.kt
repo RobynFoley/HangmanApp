@@ -12,6 +12,9 @@ class Game {
     //I used this to help me understand different loops
     //https://kotlinlang.org/docs/control-flow.html#for-loops
 
+    //I used this to for my delays
+    //https://stackoverflow.com/questions/45213706/kotlin-wait-function
+
     fun run(word: String): Boolean{
 
 
@@ -51,11 +54,14 @@ class Game {
                     }
                 }
                 println(progress)
+                    Thread.sleep(500)
                 guessCount++
 
             } else {
                 println("no")
+                    Thread.sleep(300)
                 println(progress)
+                    Thread.sleep(500)
                 guessCount++
             }}
             hangman.sort()
@@ -63,13 +69,21 @@ class Game {
 
             if (guessCount == 15){
                 println("You Lose !!!")
+                println("The word was $word")
+                Thread.sleep(500)
                 return false
             }
         }
 
 
-
+        Thread.sleep(200)
+        println("*")
+        Thread.sleep(200)
+        println("     *")
+        Thread.sleep(200)
+        println("*")
         println("You Win !!!")
+        Thread.sleep(500)
         return true
 
     }
