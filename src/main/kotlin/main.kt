@@ -1,6 +1,8 @@
+import controllers.AdminAPI
 import controllers.Dictionary
 import controllers.Game
 import controllers.PlayerAPI
+import models.Admin
 import models.Player
 import persistence.JSONSerializer
 import utils.readNextInt
@@ -12,6 +14,7 @@ import java.lang.System.exit
 //private val dictionary = Dictionary(XMLSerializer(File("dictionary.xml")))
 private val dictionary = Dictionary(JSONSerializer(File("dictionary.json")))
 private val playerAPI = PlayerAPI(JSONSerializer(File("players.json")))
+private val adminAPI = AdminAPI(JSONSerializer(File("admins.json")))
 private val game = Game()
 private var currentPlayer: Player? = null
 
@@ -29,21 +32,49 @@ fun mainMenu(): Int {
          > ----------------------------------
          > |           HANGMAN              |
          > ----------------------------------
-         > | NOTE MENU                      |
-         > |   1) Play                      |
-         > |   2) Switch Player             |
-         > |   3) View Players              |              PLAYER: ${currentPlayer?.playerName}    
-         > |   4) Add Player                |                      ${currentPlayer?.winCount} wins
-         > |   5) Update Player             |                      ${currentPlayer?.gamesPlayed} games played 
-         > |   6) Delete Player             |
-         > |   7) Word Dictionary           |
-         > |   8) Update Dictionary         |
+         > |  MENU                          |              PLAYER: ${currentPlayer?.playerName}
+         > |   1) Play                      |              ${currentPlayer?.winCount} wins
+         > |   2) Switch Player             |              ${currentPlayer?.gamesPlayed} games played
+         > |   3) View Players              |                  
+         > |   4) Add Player                |   
+         > |                                |                   
+         > |   5)Admin Menu                 |                      
+         > ----------------------------------
+         > |   0) Exit                      |
+         > ---------------------------------- 
+         >""".trimMargin(">"))
+    return readNextInt(" > ==>>")
+}
+
+fun adminMenu(): Int {
+   print( """ 
+         > ----------------------------------
+         > |           Admin Menu           |
+         > ----------------------------------
+         > |  MENU                          |
+         > |   1) Add admin                 |
+         > |   2) Delete admin              |
+         > |   3) Change Password           |                
+         > |   4) Delete Player             |                      
+         > |   5) Update Player             |                       
+         > |   6) Word Dictionary           |
+         > |   7) Update Dictionary         |
          > |                                |
          > ----------------------------------
          > |   0) Exit                      |
          > ---------------------------------- 
          >""".trimMargin(">"))
     return readNextInt(" > ==>>")
+}
+
+fun isAdmin(){
+
+    if(adminAPI.isAdmin(currentPlayer)){
+      val password = readNextLine("Enter Password:")
+        if(password == adminAPI.getPasswordByPlayer(currentPlayer)){
+            runAdminMenu()
+        }
+    }
 }
 
 fun switchPlayer(){
@@ -79,14 +110,72 @@ fun runMenu() {
             2 -> switchPlayer()
             3 -> viewPlayer()
             4 -> addPlayer()
-            5 -> updatePlayer()
-            6 -> deletePlayer()
-            7 -> wordDictionary()
-            8 -> updateDictionary()
+            5 -> isAdmin()
             0 -> exitApp()
             else -> println("Invalid option entered: $option")
         }
     } while (true)
+}
+
+fun runAdminMenu() {
+    do{
+        val option = adminMenu()
+        when (option) {
+            1 -> addAdmin()
+            2 -> deleteAdmin()
+            3 -> updatePassword()
+            4 -> deletePlayer()
+            5 -> updatePlayer()
+            6 -> wordDictionary()
+            7 -> updateDictionary()
+            0 -> runMenu()
+            else -> println("Invalid option entered: $option")
+        }
+    } while (true)
+}
+
+fun addAdmin(){
+    println(playerAPI.listPlayers())
+    if (playerAPI.numberOfPlayers() > 0) {
+        val index = readNextInt("Enter the index of the player you want to make admin: ")
+        if(playerAPI.isValidIndex(index)){
+            println("Default password is 'admin'")
+          if(  adminAPI.add(Admin(playerAPI.getPlayer(index), "admin"))){
+              println("A new admin was added")
+          }
+        }
+
+
+    }
+
+}
+
+fun deleteAdmin(){
+    println(adminAPI.listAdmins())
+
+    if (adminAPI.numberOfAdmins() > 0) {
+
+        val indexToDelete = readNextInt("Enter the index of the admin to delete: ")
+
+        val playerToDelete = adminAPI.removeAdmin(indexToDelete)
+        if (playerToDelete != null) {
+            println("Delete Successful! ")
+        } else {
+            println("Delete NOT Successful")
+        }
+    }
+}
+
+fun updatePassword(){
+    val currentPassword = readNextLine("Enter Current Password: ")
+    if (currentPassword == adminAPI.getPasswordByPlayer(currentPlayer)){
+        val newPassword = readNextLine("Enter New Password: ")
+        val confirmPassword = readNextLine("Retype New Password: ")
+        if (confirmPassword == newPassword){
+        adminAPI.updatePasswordByPlayer(currentPlayer, newPassword)}else{
+            println("Passwords do not match")
+        }
+    }
 }
 
 fun play(){
@@ -99,8 +188,8 @@ fun play(){
 
 }
 
-fun viewPlayer(){
-println(playerAPI.listPlayers())
+fun viewPlayer() {
+    println(playerAPI.listPlayers())
 }
 
 fun addPlayer(){
@@ -178,9 +267,9 @@ fun updatePlayer(){
                 dictionary.deleteWord(index)
                 }else{println("Invalid response")}
 
-
-
             }
+
+
 
 
 fun dictionaryStartUp(){
@@ -189,7 +278,6 @@ fun dictionaryStartUp(){
     for (word in words) {
         dictionary.addWord(word!!)
     }
-
 }
 
         fun exitApp() {
@@ -211,6 +299,12 @@ fun dictionaryStartUp(){
                 System.err.println("Error writing to file: $e")
             }
 
+            try {
+                adminAPI.store()
+            } catch (e: Exception) {
+                System.err.println("Error writing to file: $e")
+            }
+
         }
 
         fun load() {
@@ -222,6 +316,12 @@ fun dictionaryStartUp(){
 
             try {
                 playerAPI.load()
+            } catch (e: Exception) {
+                System.err.println("Error reading from file: $e")
+            }
+
+            try {
+                adminAPI.load()
             } catch (e: Exception) {
                 System.err.println("Error reading from file: $e")
             }
